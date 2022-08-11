@@ -1,25 +1,38 @@
-// Read how much coffee the machine needs to make (in cups);
-// Figure out how much of each ingredient is required. 
-// Note that one cup of coffee contains 200 ml of water, 50 ml of milk, and 15 g of coffee beans;
-// Output the required ingredients.
-// Example:
-// Write how many cups of coffee you will need:
-// > 25
-// For 25 cups of coffee you will need:
-// 5000 ml of water
-// 1250 ml of milk
-// 375 g of coffee beans
-
 const input = require('sync-input');
 
 let waterPerCup = 200;
 let milkPerCup = 50;
 let beansPerCup = 15;
 
-console.log("Write how many cups of coffee you will need:")
+// input
+console.log("Write how many ml of water the coffee machine has:");
+let water = input();
+console.log("Write how many ml of milk the coffee machine has:");
+let milk = input();
+console.log("Wrtie how many grams of coffee beans the coffee machine has:");
+let beans = input();
+console.log("Write how many cups of coffee you will need:");
 let cups = input();
-console.log(`For ${cups} of coffee you will need:
-${cups * waterPerCup} ml of water
-${cups * milkPerCup} ml of milk
-${cups * beansPerCup} g of coffee beans`);
 
+// calculation
+let waterCups = Math.floor(water / waterPerCup);
+let milkCups = Math.floor(milk / milkPerCup);
+let beansCups = Math.floor(beans / beansPerCup);
+
+let leastCups = waterCups;
+if (milkCups < leastCups) {
+    leastCups = milkCups;
+}
+
+if (beansCups < leastCups) {
+    leastCups = beansCups;
+}
+
+// output
+if (leastCups == cups) {
+    console.log("Yes, I can make that amount of coffee");
+} else if (leastCups < cups) {
+    console.log(`No, I can make only ${leastCups} cups of coffee`);
+} else {
+    console.log(`Yes, I can make that amount of coffee (and even ${leastCups - cups} more than that)`);
+}
