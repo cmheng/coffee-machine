@@ -20,21 +20,30 @@ let stateMoney = 0;
 
 function main() {
     initMachine();
-    displayMachineState();
-    switch (getAction()) {
-        case "buy":
-            actionBuy();
-            break;
-        case "fill":
-            actionFill();
-            break;
-        case "take":
-            actionTake();
-            break;
-        default:
-            console.log("Unknown action");
+
+    let isExit = false;
+
+    while (!isExit) {
+        switch (getAction()) {
+            case "buy":
+                actionBuy();
+                break;
+            case "fill":
+                actionFill();
+                break;
+            case "take":
+                actionTake();
+                break;
+            case "remaining":
+                displayMachineState();
+                break;
+            case "exit":
+                isExit = true;
+                break;
+            default:
+                console.log("Unknown action");
+        }
     }
-    displayMachineState();
 }
 
 function initMachine() {
@@ -52,40 +61,26 @@ ${stateMilk} ml of milk
 ${stateBeans} g of coffee beans
 ${stateCups} disposable cups
 $${stateMoney} of money
-
     `);
 }
 
 function getAction() {
-    console.log("Write action (buy, fill, take):");
+    console.log("Write action (buy, fill, take, remaining, exit):");
     let action = input();
+    console.log();
     return action;
 }
 
 function actionBuy() {
-    console.log("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino:");
+    console.log("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino, back - to main menu:");
     let choice = input();
-    if (choice === "1") {
-        stateWater -= ESPRESSO_WATER;
-        stateBeans -= ESPRESSO_BEANS;
-        stateCups--;
-        stateMoney += ESPRESSO_COST;
-    } else if (choice === "2") {
-        stateWater -= LATTE_WATER;
-        stateMilk -= LATTE_MILK;
-        stateBeans -= LATTE_BEANS;
-        stateCups--;
-        stateMoney += LATTE_COST;
-    } else if (choice === "3") {
-        stateWater -= CAPPUCCINO_WATER;
-        stateMilk -= CAPPUCCINO_MILK;
-        stateBeans -= CAPPUCCINO_BEANS;
-        stateCups--;
-        stateMoney += CAPPUCCINO_COST;
-    } else {
-        console.log("Invalid choice");
+
+    if (choice === "back") {
+        console.log();
+        return;
     }
 
+    makeCoffee(choice);
     console.log();
 }
 
@@ -105,6 +100,57 @@ function actionTake() {
     console.log("I gave you $" + stateMoney);
     stateMoney = 0;
     console.log();
+}
+
+function makeCoffee(coffeeType) {
+
+    let hasWater = true;
+    let hasMilk = true;
+    let hasBeans = true;
+    let hasCups = true;
+    let coffeeWater = 0;
+    let coffeeMilk = 0;
+    let coffeeBeans = 0;
+    let coffeeCost = 0;
+
+    if (coffeeType === "1") {
+        coffeeWater = ESPRESSO_WATER;
+        coffeeMilk = 0;
+        coffeeBeans = ESPRESSO_BEANS;
+        coffeeCost = ESPRESSO_COST;
+    } else if (coffeeType === "2") {
+        coffeeWater = LATTE_WATER;
+        coffeeMilk = LATTE_MILK;
+        coffeeBeans = LATTE_BEANS;
+        coffeeCost = LATTE_COST;
+    } else if (coffeeType === "3") {
+        coffeeWater = CAPPUCCINO_WATER;
+        coffeeMilk = CAPPUCCINO_MILK;
+        coffeeBeans = CAPPUCCINO_BEANS;
+        coffeeCost = CAPPUCCINO_COST;
+    }
+
+    if (stateWater - coffeeWater < 0) hasWater = false;
+    if (stateMilk - coffeeMilk < 0) hasMilk = false;
+    if (stateBeans - coffeeBeans < 0) hasBeans = false;
+    if (stateCups - 1 < 0) hasCups = false;
+
+    if (hasWater && hasMilk && hasBeans && hasCups) {
+        console.log("I have enough resources, making you a coffee!");
+        stateWater -= coffeeWater;
+        stateMilk -= coffeeMilk;
+        stateBeans -= coffeeBeans;
+        stateCups--;
+        stateMoney += coffeeCost;
+    } else if (!hasWater) {
+        console.log("Sorry, not enough water!");
+    } else if (!hasBeans) {
+        console.log("Sorry, not enough coffee beans!");
+    } else if (!hasMilk) {
+        console.log("Sorry, not enough milk!");
+    } else if (!hasCups) {
+        console.log("Sorry, not enough cups!");
+    }
 }
 
 main();
